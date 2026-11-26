@@ -25,18 +25,3 @@ gcc -Wall -Wextra client.c -o example_client
 ```
 
 The server prints `Received: SUBMIT 10 0 echo hello`. The example client prints `client: the server said "OK"`.
-
-## Next milestone
-
-Members A and B will connect the client protocol to the job table. The milestone is complete when a client can submit a command, receive a saved team-prefixed ID, and query that ID to see `QUEUED` before a worker starts. Worker execution, file transfer, and checksum verification are planned for later milestones.
-
-## Team responsibilities
-
-Team number and member names are pending.
-
-| Member | Responsibility |
-|---|---|
-| A (team lead) | Client, protocol and server request handling |
-| B | Scheduler, job table, journal and recovery |
-| C | Worker, process limits, torrent transfer and SHA-256 verification |
-| D | GitHub, build, testing and report |
