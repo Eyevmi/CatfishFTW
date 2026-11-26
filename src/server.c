@@ -1,56 +1,38 @@
-#include <arpa/inet.h>
+#include <stddef.h>
 #include <stdio.h>
-#include <string.h>
-#include <sys/socket.h>
 #include <unistd.h>
-//first server prototype
-int main(void){
-    int listener = socket(AF_INET, SOCK_STREAM, 0);
-    if (listener < 0) {
-        perror("socket");
-        return 1;
-    }
-    
-    int opt = 1;
-    setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof opt);
+#include "net.h"
 
-    struct sockaddr_in address = {
-        .sin_family = AF_INET,
-        .sin_port = htons(5000),
-        .sin_addr.s_addr = htonl(INADDR_LOOPBACK)
-    };
+int receive_line(int client, char *line, size_t capacity);
+int send_text(int client, const char *text);
 
-    if (bind(listener, (struct sockaddr*)&address, sizeof address) < 0) {
-        perror("bind");
-        close(listener);
-        return 1;
+static void handle_client(int client)
+{
+    char request[4096];
+    int result = receive_line(client, request, sizeof request);
+
+    if (result < 0) {
+        perror("receive_line");
+        return;
     }
 
-    if (listen(listener, 1) < 0) {
-        perror("listen");
-        close(listener);
-        return 1;
+    if (result == 0)
+        return;
+
+    printf("Received: %s\n", request);
+
+    if (send_text(client, "OK\n") < 0)
+        perror("send_text");
+}
+
+int main(void)
+{
+    int listener = server_listen(5000);
+    puts("Server listening on port 5000");
+
+    for (;;) {
+        int client = server_accept(listener);
+        handle_client(client);
+        close(client);
     }
-
-    puts("Server listening on 127.0.0.1 port 5000");
-
-    for(;;){
-        int client = accept(listener, NULL, NULL);
-        if (client < 0) {
-            perror("accept");
-            break;
-        }
-        char buffer[4096];
-        if (fgetc(line, sizeof(line), input) && strchr(line, '\n')){
-            printf("Received: %s", line);
-            if(send(client, line, strlen(line), 0) < 0){
-                perror("send");
-            }
-        }
-
-        fclose(input);
-    }
-
-    close(listener);
-    return 0;
 }

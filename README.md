@@ -1,1 +1,1 @@
-LAN Torrent Client, check by catfish
+LAN Torrent Client
